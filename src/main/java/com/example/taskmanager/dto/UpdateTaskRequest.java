@@ -19,6 +19,6 @@ public class UpdateTaskRequest {
     public String getDescription( ) { return this.description; }
     public void setDescription(String description) { this.description = description; }
 
-    public boolean isCompleted( ) { return this.completed; }
+    public Boolean isCompleted( ) { return this.completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.taskmanager.dto.*;
 import com.example.taskmanager.service.*;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,14 +29,14 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDTO> createTask(@RequestBody CreateTaskRequest request) {
+    public ResponseEntity<TaskDTO> createTask(@Valid @RequestBody CreateTaskRequest request) {
         TaskDTO task = service.createTask(request);
         URI location = URI.create(String.format("/api/tasks/%d", task.getId( )));
         return ResponseEntity.created(location).body(task);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDTO> updateTask(@PathVariable Long id, @RequestBody UpdateTaskRequest request) {
+    public ResponseEntity<TaskDTO> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskRequest request) {
         return ResponseEntity.ok(service.updateTask(id, request));
     }
 

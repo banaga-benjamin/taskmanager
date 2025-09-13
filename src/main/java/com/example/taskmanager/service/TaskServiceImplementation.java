@@ -7,6 +7,7 @@ import com.example.taskmanager.dto.*;
 import com.example.taskmanager.model.*;
 import org.springframework.stereotype.*;
 import com.example.taskmanager.repository.*;
+import com.example.taskmanager.exception.ResourceNotFoundException;
 
 @Service
 public class TaskServiceImplementation implements TaskService {
@@ -19,7 +20,7 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public TaskDTO getTaskByID(Long id) {
-        Task task = repo.findById(id).orElseThrow(( ) -> new RuntimeException("Task not found with id: " + id));
+        Task task = repo.findById(id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
         return mapToDTO(task);
     }
 
@@ -41,7 +42,7 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public TaskDTO updateTask(Long id, UpdateTaskRequest request) {
-        Task task = repo.findById(id).orElseThrow(( ) -> new RuntimeException("Task not found with id: " + id));
+        Task task = repo.findById(id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
         if (request.getTitle( ) != null) task.setTitle(request.getTitle( ));
         if (request.getDescription( ) != null) task.setDescription(request.getDescription( ));
         if (request.isCompleted( ) != null) task.setCompleted(request.isCompleted( ));
@@ -52,7 +53,7 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public void deleteTask(Long id) {
-        Task task = repo.findById(id).orElseThrow(( ) -> new RuntimeException("Task not found with id: " + id));
+        Task task = repo.findById(id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
         repo.delete(task);
     }
 

@@ -4,22 +4,23 @@ import com.example.taskmanager.dto.*;
 import com.example.taskmanager.model.Task;
 import com.example.taskmanager.repository.TaskRepository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.http.MediaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
 
+import jakarta.transaction.Transactional;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+
+@Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
 class TaskControllerTest {
@@ -79,7 +80,7 @@ class TaskControllerTest {
             { "title": "New Title", "description": "New Description", "completed": true }
             """;
 
-        mock.perform(put("/api/tasks/{id}", task.getId())
+        mock.perform(put("/api/tasks/{id}", task.getId( ))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(updateJson))
             .andExpect(status( ).isOk( ))

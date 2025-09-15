@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 
-
 @Transactional
 @SpringBootTest
 class TaskServiceIntegrationTest {
@@ -23,11 +22,11 @@ class TaskServiceIntegrationTest {
     @Autowired
     private TaskRepository repo;
 
-    // // clear database
-    // @BeforeEach
-    // void clearDatabase( ) {
-    //     repo.deleteAll( );
-    // }
+    // clear database
+    @BeforeEach
+    void setup( ) {
+        repo.deleteAll( );
+    }
 
     // --- CREATE ---
     @Test

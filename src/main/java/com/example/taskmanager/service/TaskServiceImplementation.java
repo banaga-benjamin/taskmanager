@@ -8,31 +8,42 @@ import com.example.taskmanager.model.*;
 import org.springframework.stereotype.*;
 import com.example.taskmanager.repository.*;
 import com.example.taskmanager.exception.ResourceNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class TaskServiceImplementation implements TaskService {
 
     private final TaskRepository repo;
+    private final UserRepository repouser;
 
-    public TaskServiceImplementation(TaskRepository repo) {
+    public TaskServiceImplementation(TaskRepository repo, UserRepository repouser) {
         this.repo = repo;
+        this.repouser = repouser;
+    }
+
+    private User getCurrentUser( ) {
+        String username = SecurityContextHolder.getContext( ).getAuthentication( ).getName( );
+        return repouser.findByUsername(username).orElseThrow(( ) -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
     public TaskDTO getTaskByID(Long id) {
-        Task task = repo.findById(id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
+        User user = getCurrentUser( );
+        Task task = repo.findByUserAndId(user, id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
         return mapToDTO(task);
     }
 
     @Override
-    public List<TaskDTO> getAllTasks() {
-        List<Task> tasks = repo.findAll( );
+    public List<TaskDTO> getAllTasks( ) {
+        User user = getCurrentUser( );
+        List<Task> tasks = repo.findByUser(user);
         return tasks.stream( ).map(this::mapToDTO).collect(Collectors.toList( ));
     }
 
     @Override
     public TaskDTO createTask(CreateTaskRequest request) {
         Task task = new Task( );
+        task.setUser(getCurrentUser( ));
         task.setTitle(request.getTitle( ));
         task.setDescription(request.getDescription( ));
 
@@ -42,7 +53,8 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public TaskDTO updateTask(Long id, UpdateTaskRequest request) {
-        Task task = repo.findById(id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
+        User user = getCurrentUser( );
+        Task task = repo.findByUserAndId(user, id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
         if (request.getTitle( ) != null) task.setTitle(request.getTitle( ));
         if (request.getDescription( ) != null) task.setDescription(request.getDescription( ));
         if (request.isCompleted( ) != null) task.setCompleted(request.isCompleted( ));
@@ -53,7 +65,8 @@ public class TaskServiceImplementation implements TaskService {
 
     @Override
     public void deleteTask(Long id) {
-        Task task = repo.findById(id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
+        User user = getCurrentUser( );
+        Task task = repo.findByUserAndId(user, id).orElseThrow(( ) -> new ResourceNotFoundException("Task not found with id: " + id));
         repo.delete(task);
     }
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
     
-    private final String secret = "mysupersecretkeymysupersecretkey"; // must be base 64  or long enough; todo: move to env
+    private final String secret = "mysupersecretkeymysupersecretkeymysupersecretkeymysupersecretkeymysupersecretkeymysupersecretkey"; // must be base 64  or long enough; todo: move to env
     private final Key key = Keys.hmacShaKeyFor(secret.getBytes( ));
     private final long EXPIRATION = 1000 * 60 * 60;
 

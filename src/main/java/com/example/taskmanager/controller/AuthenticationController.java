@@ -29,7 +29,7 @@ public class AuthenticationController {
             throw new RuntimeException("Username already taken");
         }
 
-        repo.save(new User(request.getUsername( ), request.getPassword( )));
+        repo.save(new User(request.getUsername( ), encoder.encode(request.getPassword( ))));
         return ResponseEntity.ok("User registered successfully");
     }
 

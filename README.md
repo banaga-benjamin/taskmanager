@@ -161,7 +161,7 @@ http://localhost:8080/api/auth
     {
         "title": "updated title",
         "description": "updated description",
-        "completed": true / false
+        "completed": true or false
     }
     ```
 

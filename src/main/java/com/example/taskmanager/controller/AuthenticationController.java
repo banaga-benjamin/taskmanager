@@ -4,10 +4,15 @@ import com.example.taskmanager.model.User;
 import com.example.taskmanager.dto.AuthRequest;
 import com.example.taskmanager.dto.AuthResponse;
 import com.example.taskmanager.security.JwtUtil;
+import com.example.taskmanager.dto.UpdatePasswordRequest;
+import com.example.taskmanager.exception.BadRequestException;
+import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.repository.UserRepository;
+
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RestController
@@ -26,7 +31,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody AuthRequest request) {
         if (repo.existsByUsername(request.getUsername( ))) {
-            throw new RuntimeException("Username already taken");
+            throw new BadRequestException("Username already taken");
         }
 
         repo.save(new User(request.getUsername( ), encoder.encode(request.getPassword( ))));
@@ -36,7 +41,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         User user = repo.findByUsername(request.getUsername( ))
-            .orElseThrow(( ) -> new RuntimeException("User not found"));
+            .orElseThrow(( ) -> new ResourceNotFoundException("User not found"));
 
         if (!encoder.matches(request.getPassword( ), user.getPassword( ))) {
             throw new RuntimeException("Invalid credentials.");
@@ -47,5 +52,20 @@ public class AuthenticationController {
         response.setToken(token);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@RequestBody UpdatePasswordRequest passwordRequest) {
+        String username = SecurityContextHolder.getContext( ).getAuthentication( ).getName( );
+        User user = repo.findByUsername(username).orElseThrow(( ) -> new ResourceNotFoundException("User not found"));
+
+        if (!encoder.matches(passwordRequest.getOldPassword( ), passwordRequest.getNewPassword( ))) {
+            throw new BadRequestException("Old password is incorrect");
+        }
+
+        user.setPassword(encoder.encode(passwordRequest.getNewPassword( )));
+        repo.save(user);
+
+        return ResponseEntity.ok("Password updated successfully");
     }
 }

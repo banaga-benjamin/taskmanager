@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,9 +23,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleNotFound(ResourceNotFoundException ex) {
-        Map<String, String> error = new HashMap<>( );
-        error.put("error", ex.getMessage( ));
+    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
+        Map<String, Object> error = new HashMap<>( );
+        error.put("timestamp", LocalDateTime.now( ));
+        error.put("message", ex.getMessage( ));
+        error.put("error", "Not Found");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex) {
+        Map<String, Object> error = new HashMap<>( );
+        error.put("timestamp", LocalDateTime.now( ));
+        error.put("message", ex.getMessage( ));
+        error.put("error", "Bad Request");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }

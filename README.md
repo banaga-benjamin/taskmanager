@@ -10,7 +10,8 @@ Supports creating, reading, updating, and deleting tasks.
 - RESTful API with JSON payloads
 - Task completion tracking
 - PostGreSQL persistence
-- Integration tests for service and controller layers
+- Data security with JWT authentication
+- Integration tests for task management and authentication controller layers
 
 ---
 
@@ -56,8 +57,11 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 mvn spring-boot:run
 ```
+---
 
-### 5, Run Tests
+## 📦 Testing
+
+### 1, Configure PostGreSQL
 Configure PostGreSQL
 ```sql
 CREATE DATABASE taskdb_test;
@@ -68,7 +72,25 @@ GRANT ALL PRIVILEGES ON DATABASE taskdb_test TO taskuser;
 GRANT ALL PRIVILEGES ON SCHEMA public TO taskuser;
 ```
 
-Run Tests
+### 2. Application Properties
+For testing, the application is configured with the following defaults in
+`src/test/resources/application.properties`:
+```
+# Server settings
+server.port=8080
+
+# PostgreSQL datasource
+spring.datasource.url=jdbc:postgresql://localhost:5432/taskdb_test
+spring.datasource.username=taskuser
+spring.datasource.password=taskpass
+
+# JPA settings
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+### 3. Run Tests
 
 ```
 mvn test
@@ -78,12 +100,50 @@ mvn test
 
 ## 📖 API Documentation
 
-### Base URL
-```bash
+### Base URL and Login
+
+The base url for accessing tasks is:
+```
 http://localhost:8080/api/tasks
 ```
 
-### Endpoints (endpoint and request body)
+For the register, login, and pasword change endpoints, the base url is:
+```
+http://localhost:8080/api/auth
+```
+
+### Register, Login, & Password Change Endpoints (endpoint and request body)
+1. Register:
+- POST `/api/auth/register`
+- Request Body:
+    ```json
+    {
+        "username": "user name",
+        "password": "user password"
+    }
+    ```
+
+2. Login:
+- POST `/api/auth/login`
+- Request Body:
+    ```json
+    {
+        "username": "user name",
+        "password": "user password"
+    }
+    ```
+
+3. Password Change:
+- PUT `/api/auth/update-password`
+- Request Body:
+    ```json
+    {
+        "oldPassword": "old password",
+        "newPassword": "new password"
+    }
+    ```
+    
+### Task Endpoints (endpoint and request body)
 
 1. Get All Tasks:
 - GET `/api/tasks`
@@ -114,3 +174,12 @@ http://localhost:8080/api/tasks
         "description": "task description"
     }
     ```
+### JWT Authentication
+
+The API uses JWT for authentication. When accessing the task endpoints, a valid token must be present as the value of the Authorizaiton header of the request body.
+
+```json
+    {
+        "Authorization": "Bearer [valid-token]",
+    }
+```

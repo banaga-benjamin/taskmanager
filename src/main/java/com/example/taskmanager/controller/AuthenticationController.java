@@ -44,7 +44,7 @@ public class AuthenticationController {
             .orElseThrow(( ) -> new ResourceNotFoundException("User not found"));
 
         if (!encoder.matches(request.getPassword( ), user.getPassword( ))) {
-            throw new RuntimeException("Invalid credentials.");
+            throw new ResourceNotFoundException("User not found.");
         }
 
         AuthResponse response = new AuthResponse( );
@@ -54,12 +54,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/update-password")
+    @PutMapping("/update-password")
     public ResponseEntity<String> updatePassword(@RequestBody UpdatePasswordRequest passwordRequest) {
         String username = SecurityContextHolder.getContext( ).getAuthentication( ).getName( );
         User user = repo.findByUsername(username).orElseThrow(( ) -> new ResourceNotFoundException("User not found"));
 
-        if (!encoder.matches(passwordRequest.getOldPassword( ), passwordRequest.getNewPassword( ))) {
+        if (!encoder.matches(passwordRequest.getOldPassword( ), user.getPassword( ))) {
             throw new BadRequestException("Old password is incorrect");
         }
 

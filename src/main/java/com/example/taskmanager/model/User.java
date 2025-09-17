@@ -32,7 +32,7 @@ public class User {
     public Long getID( ) { return this.id; }
 
     public String getUsername( ) { return this.username; }
-    public void setUserName(String username) { this.username = username; }
+    public void setUsername(String username) { this.username = username; }
 
     public String getPassword( ) { return this.password; }
     public void setPassword(String password) { this.password = password; }
